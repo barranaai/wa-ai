@@ -375,18 +375,34 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     original_href = whatsapp_link.get_attribute('href')
 
                     # for live server, replace with web.whatsapp.com    
-                    new_href = re.sub(r'(whatsapp://|https://wa\.me/)', 'https://web.whatsapp.com/', original_href)
-                    new_href = re.sub(r'phone=\+?\d+', f'phone={TEST_NUMBER}', new_href) if USE_TEST_NUMBER else new_href
+                    original_href = whatsapp_link.get_attribute('href')
+
+                    if USE_TEST_NUMBER:
+                        # Removes all non-digit characters from the TEST_NUMBER (spaces, plus signs, etc.)
+                        clean_number = re.sub(r'\D', '', TEST_NUMBER)
+                        new_href = re.sub(r'phone=\+?\d+', f'phone={clean_number}', original_href)
+                    else:
+                        # Extract real number, clean it
+                        real_number_clean = re.sub(r'\D', '', real_number)
+                        new_href = re.sub(r'phone=\+?\d+', f'phone={real_number_clean}', original_href)
 
                     '''
                     # for local server testing, replace with TEST_NUMBER
+                    # Assuming TEST_NUMBER is defined
+                    clean_number = re.sub(r'\D', '', TEST_NUMBER)  # removes spaces, pluses, and any non-digit characters
                     original_href = whatsapp_link.get_attribute('href')
                     new_href = re.sub(r'phone=\+?\d+', f'phone={TEST_NUMBER}', original_href) if USE_TEST_NUMBER else original_href
                     '''
-
+                    # Introduce a flag at the start (before loop)
+                    first_whatsapp_click = True
                     driver.execute_script(f"window.open('{new_href}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1])
-                    random_sleep(3, 5)
+                    if first_whatsapp_click:
+                        log("⏳ First WhatsApp link clicked, pausing for 15 seconds for OTP allowance...", "info")
+                        time.sleep(30)  # Adjust duration as needed
+                        first_whatsapp_click = False  # Set flag to False after first use
+                    else:
+                        random_sleep(3, 5)
 
                 except Exception as e:
                     log(f"❌ Row {i}: Error opening WhatsApp link: {e}", "error")
