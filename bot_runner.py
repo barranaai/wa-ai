@@ -540,14 +540,11 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             chat_input.click()
 
             pyautogui.hotkey("command", "a")
-            random_sleep(0.2, 0.7)
+            random_sleep(0.2, 0.5)
+            pyautogui.press("backspace")
 
             # Explicitly press backspace 3 times
-            for _ in range(3):
-                pyautogui.press("backspace")
-                random_sleep(0.2, 0.9)
-                pyautogui.press("backspace")
-                random_sleep(0.1, 0.5)
+            for _ in range(5):
                 pyautogui.press("backspace")
                 random_sleep(0.5, 1.0)
 
@@ -577,7 +574,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             pyautogui.keyUp('enter')
 
             log(f"✅ Row {i}: Message typed and sent to {number}.", "success")
-            random_sleep(3, 5)
+            random_sleep(1, 3)
             driver.close()
             driver.switch_to.window(whatsapp_tab)
             random_sleep(2, 7)
@@ -607,13 +604,14 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
 
             # IMPORTANT: Switch explicitly back to WCEasy tab
             wceasy_tab = driver.window_handles[1]  # assuming your WCEasy tab is second tab
-            random_sleep(3, 8)
+            random_sleep(1, 5)
             driver.switch_to.window(wceasy_tab)
-            random_sleep(2, 5)
+            random_sleep(1, 5)
             log(f"✅ Row {i}: Successfully processed and sent message.", "success")
+            message_count += 1
             if message_count % 10 == 0:
                 log("⏸️ Pausing for 30 seconds after 10 messages...", "info")
-                random_sleep(30, 60)
+                random_sleep(20, 60)
 
     log("🏁 All done!", "success")
     driver.quit()
