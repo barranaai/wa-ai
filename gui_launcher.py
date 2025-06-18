@@ -97,7 +97,7 @@ class WhatsAppBotGUI:
 
     def load_logo(self):
         try:
-            logo_image = Image.open("barrana.png")
+            logo_image = Image.open("colored-barrana.png")
             logo_image = logo_image.resize((150, 50), Image.LANCZOS)
             logo_photo = ImageTk.PhotoImage(logo_image)
             logo_label = ttk.Label(self.root, image=logo_photo)
