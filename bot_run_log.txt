@@ -1,0 +1,102 @@
+[2025-06-18 14:26:39] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. Gangaram,
+
+My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai. I am reaching out to inquire about your unit 301 in 29 BLVD T1. Could you please let me know if it is currently vacant and available for rent? I have a qualified client who is actively searching in the building and would be very interested in scheduling a viewing at your earliest convenience if the property is available. I would appreciate it if you could confirm its availability and provide any additional details.
+
+I look forward to your response. Thank you, and have a wonderful day.
+
+Best regards,  
+Omar Bayat  
+White & Co. Real Estate (Length: 125 words)
+[2025-06-18 14:28:10] [info] 🔎 GPT Response (Attempt 1): Good Afternoon,
+
+My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai. I am contacting you regarding your unit 302 in 29 BLVD T1. Could you please let me know if it is currently vacant and available for rent? I have a qualified client who is actively searching in the building and would be interested in scheduling a viewing at your earliest convenience if the property is available. Please confirm its availability and provide any additional details. I'm looking forward to your response. Thank you, and have a wonderful day.
+
+Best regards,  
+Omar Bayat  
+White & Co. Real Estate (Length: 114 words)
+[2025-06-18 14:29:33] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. Yaghmour,
+
+My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai. I am inquiring about your unit 303 in 29 BLVD T1. Could you please let me know if it is currently vacant and available for rent? I have a qualified client who is actively searching in the building and would be eager to arrange a viewing at your earliest convenience if the property is available. Please confirm its availability along with any additional details.
+
+I look forward to your response. Thank you, and have a pleasant day ahead.
+
+Best regards,
+Omar Bayat  
+White & Co. Real Estate (Length: 116 words)
+[2025-06-18 14:31:00] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. Arain,
+
+My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai. I am contacting you regarding your unit 304 in 29 BLVD T1. Could you please let me know if it is currently vacant and available for rent? I have a qualified client who is actively searching within the building and would be keen to arrange a viewing at your earliest convenience if the property is available. I would appreciate it if you could confirm its availability and provide any additional details.
+
+I look forward to your response. Thank you, and I hope you have a wonderful day ahead.
+
+Best regards,  
+Omar Bayat  
+White & Co. Real Estate (Length: 126 words)
+[2025-06-18 14:32:29] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. Razzaq,
+
+My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, a leading British-owned brokerage in Dubai. I am reaching out to inquire about your unit 402 in 29 BLVD T1. Could you please let me know if it is currently vacant and available for rent? I have a qualified client who is actively searching in the building and would be keen on arranging a viewing at your earliest convenience if the property is available. Kindly confirm its availability and provide any additional details.
+
+I look forward to your response. Thank you, and have a wonderful day.
+
+Best regards,  
+Omar Bayat  
+White & Co. Real Estate (Length: 116 words)
+[2025-06-18 14:37:09] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. Gangaram,
+
+My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai. I am reaching out to inquire about your unit 301 in 29 BLVD T1. Could you please let me know if it is currently vacant and available for rent? I have a qualified client who is actively searching within the building and would be interested in arranging a viewing at your earliest convenience if the property is available. Kindly confirm its availability and provide any additional details.
+
+I look forward to your response. Thank you, and have a wonderful day.
+
+Best regards,  
+Omar Bayat  
+White & Co. Real Estate (Length: 118 words)
+[2025-06-18 14:44:46] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. Gangaram,
+
+My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai. I am reaching out to inquire about your unit 301 in 29 BLVD T1. Could you please let me know if it is currently vacant and available for rent? I have a qualified client who is actively searching in the building and would be keen on arranging a viewing at your earliest convenience if the property is available. I would appreciate it if you could confirm its availability and provide any further details.
+
+Looking forward to your response. Thank you, and have a wonderful day.
+
+Best regards,  
+Omar Bayat  
+White & Co. Real Estate (Length: 123 words)
+[2025-06-18 14:51:36] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. Gangaram,
+
+My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai. I'm reaching out to inquire about your unit 301 in 29 BLVD T1. Could you please let me know if it's currently vacant and available for rent? I have a qualified client actively searching in the building who would be interested in scheduling a viewing at your earliest convenience if the property is available. Kindly confirm its availability and provide any further details.
+
+I look forward to your response. Thank you, and have a wonderful day.
+
+Best regards,  
+Omar Bayat  
+White & Co. Real Estate (Length: 114 words)
+[2025-06-18 14:59:36] [info] 🔎 GPT Response (Attempt 1): Good Afternoon,
+
+Thank you for reaching out. I’m here to help with your inquiry. However, I don't have access to real-time or personal information about property availability. For details regarding the availability of unit 406 in 8 BLVD WALK, I recommend contacting the property management or a real estate agent directly.
+
+Best regards,
+[Your Name] (Length: 55 words)
+[2025-06-18 15:46:47] [info] 🔎 GPT Response (Attempt 1): ---
+Good Afternoon Mr. ALSHUWAREB,
+
+Hola Padron ALSHUWAREB, this is a quick custom message test. Confirm if your unit 101 in Al NOUJOUM TOWER is available.
+
+Best,
+Test Name
+--- (Length: 30 words)
+[2025-06-18 15:47:47] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. TAMIMI,
+
+Hola Padron TAMIMI, this is a quick custom message test. Confirm if your unit 102 in Al NOUJOUM TOWER is available.
+
+Best,
+Test Name (Length: 28 words)
+[2025-06-18 15:48:42] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. GOMES,
+
+Hola Padron GOMES, this is a quick custom message test. Confirm if your unit 103 in Al NOUJOUM TOWER is available.
+
+Best,  
+Test Name (Length: 28 words)
+[2025-06-18 15:49:37] [info] 🔎 GPT Response (Attempt 1): Good Afternoon Mr. ASRAR,
+
+Hola Padron ASRAR, this is a quick custom message test. Confirm if your unit 104 in Al NOUJOUM TOWER is available.
+
+Best,  
+Test Name (Length: 28 words)
