@@ -1,0 +1,30 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+newvenv/
+
+# Environment variables
+.env
+
+# macOS system files
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Output folders
+extracted_data/
+extracted_data_ai/
+sheet_headers_log/
+
+# Backup and test scripts
+*copy*
+*backup*
+
+# Others
+bot_run_log.txt
