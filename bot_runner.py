@@ -24,7 +24,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
 # === LOGGING SETUP ===
-LOG_FILE = "bot_run_log.txt"
+LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bot_run_log.txt")
 
 def log(msg, tag=None):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -372,19 +372,29 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
 
                     whatsapp_link = whatsapp_links[0]  # Pick the first available WhatsApp link
 
-                    original_href = whatsapp_link.get_attribute('href')
+                    #for live server, replace with web.whatsapp.com    
+                    original_href = whatsapp_link.get_attribute('href').strip()
 
-                    # for live server, replace with web.whatsapp.com    
-                    original_href = whatsapp_link.get_attribute('href')
+                    # Ensure WhatsApp Web format explicitly
+                    new_href = original_href.replace("whatsapp://", "https://web.whatsapp.com/")
 
-                    if USE_TEST_NUMBER:
-                        # Removes all non-digit characters from the TEST_NUMBER (spaces, plus signs, etc.)
-                        clean_number = re.sub(r'\D', '', TEST_NUMBER)
-                        new_href = re.sub(r'phone=\+?\d+', f'phone={clean_number}', original_href)
-                    else:
-                        # Extract real number, clean it
-                        real_number_clean = re.sub(r'\D', '', real_number)
-                        new_href = re.sub(r'phone=\+?\d+', f'phone={real_number_clean}', original_href)
+                    # Replace phone number explicitly with clean TEST_NUMBER
+                    new_href = re.sub(r'(phone=\+?[\d]+)', f'phone={TEST_NUMBER}', new_href) if USE_TEST_NUMBER else original_href
+
+                    # Remove unwanted URL encodings and whitespace explicitly
+                    new_href = re.sub(r'(%20|\s)+', '', new_href)
+
+                    # Log the final href for debugging
+                    log(f"🚀 Opening WhatsApp Link: {new_href}", "info")
+
+                    driver.execute_script(f"window.open('{new_href}', '_blank');")
+                    driver.switch_to.window(driver.window_handles[-1])
+                    random_sleep(3, 5)
+
+                    # OPTIONAL BREAK (first-time popup allowance)
+                    if message_count == 0:
+                        log("⏸️ Initial pause for manual popup allowance...", "info")
+                        random_sleep(30, 40)
 
                     '''
                     # for local server testing, replace with TEST_NUMBER
@@ -500,13 +510,10 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 EC.presence_of_element_located((By.XPATH, "//div[@contenteditable='true'][@data-tab='10']"))
             )
             chat_input.click()
+            chat_input.click()
 
-            if os.name == 'posix':
-                pyautogui.hotkey("command", "a")
-                random_sleep(0.5, 1.1)
-            else:
-                pyautogui.hotkey("ctrl", "a")
-                random_sleep(0.2, 0.9)
+            pyautogui.hotkey("command", "a")
+            random_sleep(0.2, 0.7)
 
             # Explicitly press backspace 3 times
             for _ in range(3):
@@ -531,11 +538,11 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 random_sleep(0.5, 1.4)
 
             # Random delay before sending the message
-            random_sleep(3, 5)
+            random_sleep(0.3, 0.5)
 
             # Explicitly click the chat box again to ensure it's focused
             chat_input.click()
-            random_sleep(0.2, 0.5)
+            random_sleep(0.1, 0.3)
 
             # Send Enter explicitly
             pyautogui.keyDown('enter')
@@ -543,7 +550,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             pyautogui.keyUp('enter')
 
             log(f"✅ Row {i}: Message typed and sent to {number}.", "success")
-            random_sleep(3, 8)
+            random_sleep(3, 5)
             driver.close()
             driver.switch_to.window(whatsapp_tab)
             random_sleep(2, 7)
@@ -571,12 +578,11 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             except Exception as e:
                 log(f"⚠️ No 'Use here' popup appeared or could not be clicked: {e}", "info")
 
-            message_count += 1
             # IMPORTANT: Switch explicitly back to WCEasy tab
             wceasy_tab = driver.window_handles[1]  # assuming your WCEasy tab is second tab
             random_sleep(3, 8)
             driver.switch_to.window(wceasy_tab)
-            random_sleep(2, 8)
+            random_sleep(2, 5)
             log(f"✅ Row {i}: Successfully processed and sent message.", "success")
             if message_count % 10 == 0:
                 log("⏸️ Pausing for 30 seconds after 10 messages...", "info")
