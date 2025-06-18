@@ -373,7 +373,16 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     whatsapp_link = whatsapp_links[0]  # Pick the first available WhatsApp link
 
                     original_href = whatsapp_link.get_attribute('href')
+
+                    # for live server, replace with web.whatsapp.com    
+                    new_href = re.sub(r'(whatsapp://|https://wa\.me/)', 'https://web.whatsapp.com/', original_href)
+                    new_href = re.sub(r'phone=\+?\d+', f'phone={TEST_NUMBER}', new_href) if USE_TEST_NUMBER else new_href
+
+                    '''
+                    # for local server testing, replace with TEST_NUMBER
+                    original_href = whatsapp_link.get_attribute('href')
                     new_href = re.sub(r'phone=\+?\d+', f'phone={TEST_NUMBER}', original_href) if USE_TEST_NUMBER else original_href
+                    '''
 
                     driver.execute_script(f"window.open('{new_href}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1])
@@ -478,7 +487,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
 
             if os.name == 'posix':
                 pyautogui.hotkey("command", "a")
-                random_sleep(0.2, 1.1)
+                random_sleep(0.5, 1.1)
             else:
                 pyautogui.hotkey("ctrl", "a")
                 random_sleep(0.2, 0.9)
@@ -486,9 +495,11 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             # Explicitly press backspace 3 times
             for _ in range(3):
                 pyautogui.press("backspace")
+                random_sleep(0.2, 0.9)
                 pyautogui.press("backspace")
+                random_sleep(0.1, 0.5)
                 pyautogui.press("backspace")
-                random_sleep(0.1, 0.3)
+                random_sleep(0.5, 1.0)
 
             # Safety check for short message
             if len(message.strip().split()) < 5:
@@ -504,7 +515,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 random_sleep(0.5, 1.4)
 
             # Random delay before sending the message
-            random_sleep(1.5, 3.0)
+            random_sleep(3, 5)
 
             # Explicitly click the chat box again to ensure it's focused
             chat_input.click()
@@ -516,10 +527,10 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             pyautogui.keyUp('enter')
 
             log(f"✅ Row {i}: Message typed and sent to {number}.", "success")
-
+            random_sleep(3, 8)
             driver.close()
             driver.switch_to.window(whatsapp_tab)
-            random_sleep(2, 3)
+            random_sleep(2, 7)
 
             # Handle "WhatsApp open in another window" popup
             
@@ -529,7 +540,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 if continue_btn.is_displayed():
                     continue_btn.click()
                     log("✅ Clicked 'Continue' button popup")
-                    random_sleep(1, 2)
+                    random_sleep(3, 8)
             except:
                 pass
             
@@ -540,20 +551,20 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 random_sleep(2, 3)
                 use_here_button.click()
                 log("✅ Clicked 'Use here' button on WhatsApp Web popup.")
-                random_sleep(2, 3)
+                random_sleep(3, 7)
             except Exception as e:
                 log(f"⚠️ No 'Use here' popup appeared or could not be clicked: {e}", "info")
 
             message_count += 1
             # IMPORTANT: Switch explicitly back to WCEasy tab
             wceasy_tab = driver.window_handles[1]  # assuming your WCEasy tab is second tab
-            random_sleep(2, 3)
+            random_sleep(3, 8)
             driver.switch_to.window(wceasy_tab)
-            random_sleep(2, 4)
+            random_sleep(2, 8)
             log(f"✅ Row {i}: Successfully processed and sent message.", "success")
             if message_count % 10 == 0:
                 log("⏸️ Pausing for 30 seconds after 10 messages...", "info")
-                time.sleep(30)
+                random_sleep(30, 60)
 
     log("🏁 All done!", "success")
     driver.quit()
