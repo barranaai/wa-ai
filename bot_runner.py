@@ -544,16 +544,18 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 chat_input.send_keys(Keys.CONTROL + 'a')  # Select all text
                 random_sleep(0.2, 0.5)
                 chat_input.send_keys(Keys.DELETE)  # Delete selected text
+                random_sleep(0.1, 0.3)
             except Exception:
                 # Fallback for Mac
                 chat_input.send_keys(Keys.COMMAND + 'a')  # For Mac compatibility
                 random_sleep(0.2, 0.5)
                 chat_input.send_keys(Keys.DELETE)  # Delete selected text
+                random_sleep(0.1, 0.3)
 
             # Explicitly press backspace 3 times
             for _ in range(5):
                 pyautogui.press("delete")
-                random_sleep(0.5, 1.0)
+                random_sleep(0.1, 0.2)
 
             # Safety check for short message
             if len(message.strip().split()) < 5:
