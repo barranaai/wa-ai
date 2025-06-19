@@ -448,43 +448,51 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 start = time.time()
                 chat_loaded = False
 
-                while time.time() - start < 20:
+                chat_loaded = False
+                max_wait_time = 20
+                end_time = time.time() + max_wait_time
+
+                while time.time() < end_time:
                     try:
-                        for btn in driver.find_elements(By.XPATH, "//a[@id='action-button' or .//span[text()='Continue to Chat']]"):
-                            if btn.is_displayed():
-                                btn.click()
-                                log("✅ Clicked 'Continue to Chat'")
-                                break
+                        continue_chat_btn = WebDriverWait(driver, 2).until(
+                            EC.element_to_be_clickable((By.XPATH, "//a[@id='action-button' or .//span[text()='Continue to Chat']]"))
+                        )
+                        continue_chat_btn.click()
+                        log("✅ Clicked 'Continue to Chat' button quickly.")
+                        random_sleep(0.5, 1)
                     except:
-                        pass
+                        pass  # button not found yet
 
                     try:
-                        for btn in driver.find_elements(By.XPATH, "//a[contains(@href, 'web.whatsapp.com/send') or .//span[text()='use WhatsApp Web']]"):
-                            if btn.is_displayed():
-                                btn.click()
-                                log("✅ Clicked 'Use WhatsApp Web'")
-                                random_sleep(0.2, 0.5)
-                                break
+                        use_whatsapp_web_btn = WebDriverWait(driver, 2).until(
+                            EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'web.whatsapp.com/send') or .//span[text()='use WhatsApp Web']]"))
+                        )
+                        use_whatsapp_web_btn.click()
+                        log("✅ Clicked 'Use WhatsApp Web' button quickly.")
+                        random_sleep(0.5, 1)
                     except:
-                        pass
+                        pass  # button not found yet
 
-                    # ✅ New logic: Click "Continue" button popup
                     try:
-                        continue_btn = driver.find_element(By.XPATH, "//button//div[contains(text(),'Continue')]")
-                        if continue_btn.is_displayed():
-                            continue_btn.click()
-                            log("✅ Clicked 'Continue' button popup")
-                            random_sleep(1, 2)
+                        continue_popup_btn = WebDriverWait(driver, 1).until(
+                            EC.element_to_be_clickable((By.XPATH, "//button//div[contains(text(),'Continue')]"))
+                        )
+                        continue_popup_btn.click()
+                        log("✅ Clicked 'Continue' popup button quickly.")
+                        random_sleep(0.5, 1)
                     except:
-                        pass
+                        pass  # popup button not found yet
 
+                    # Quickly check if chat loaded successfully
                     try:
                         driver.find_element(By.XPATH, "//div[@contenteditable='true'][@data-tab='10']")
                         chat_loaded = True
-                        log("✅ WhatsApp chat loaded.")
+                        log("✅ WhatsApp chat loaded quickly.")
                         break
                     except:
-                        pass
+                        pass  # chat box not loaded yet
+
+                    random_sleep(0.5, 1)  # Short sleep for next retry
 
                     time.sleep(1)
 
@@ -537,20 +545,26 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 EC.presence_of_element_located((By.XPATH, "//div[@contenteditable='true'][@data-tab='10']"))
             )
             chat_input.click()
+            random_sleep(0.3, 0.5)
             chat_input.click()
+            random_sleep(0.3, 0.5)
 
             try:
-                # Try Windows/Linux shortcut
                 chat_input.send_keys(Keys.CONTROL + 'a')  # Select all text
-                random_sleep(0.1, 0.3)
+                random_sleep(0.2, 0.4)
                 chat_input.send_keys(Keys.DELETE)  # Delete selected text
-                random_sleep(0.1, 0.3)
+                random_sleep(0.2, 0.4)
             except Exception:
-                # Fallback for Mac
                 chat_input.send_keys(Keys.COMMAND + 'a')  # For Mac compatibility
-                random_sleep(0.1, 0.3)
+                random_sleep(0.2, 0.4)
                 chat_input.send_keys(Keys.DELETE)  # Delete selected text
-                random_sleep(0.1, 0.3)
+                random_sleep(0.2, 0.4)
+
+            # Additional explicit clearing and focusing (KEY STEP)
+            chat_input.click()
+            random_sleep(0.3, 0.6)
+            pyautogui.press("backspace", presses=3, interval=0.2)  # explicitly clear residual invisible characters
+            random_sleep(0.3, 0.5)
 
             '''
             # Explicitly press backspace 3 times
