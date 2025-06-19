@@ -455,7 +455,6 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                             if btn.is_displayed():
                                 btn.click()
                                 log("✅ Clicked 'Continue to Chat'")
-                                random_sleep(0.5, 1)
                                 break
                     except:
                         pass
@@ -542,20 +541,23 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             try:
                 # Try Windows/Linux shortcut
                 chat_input.send_keys(Keys.CONTROL + 'a')  # Select all text
-                random_sleep(0.2, 0.5)
+                random_sleep(0.1, 0.3)
                 chat_input.send_keys(Keys.DELETE)  # Delete selected text
                 random_sleep(0.1, 0.3)
             except Exception:
                 # Fallback for Mac
                 chat_input.send_keys(Keys.COMMAND + 'a')  # For Mac compatibility
-                random_sleep(0.2, 0.5)
+                random_sleep(0.1, 0.3)
                 chat_input.send_keys(Keys.DELETE)  # Delete selected text
                 random_sleep(0.1, 0.3)
 
+            '''
             # Explicitly press backspace 3 times
             for _ in range(5):
                 pyautogui.press("delete")
                 random_sleep(0.1, 0.2)
+
+            '''
 
             # Safety check for short message
             if len(message.strip().split()) < 5:
@@ -570,9 +572,6 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 pyautogui.keyUp('shift')
                 random_sleep(0.5, 1.4)
 
-            # Random delay before sending the message
-            random_sleep(0.3, 0.5)
-
             # Explicitly click the chat box again to ensure it's focused
             chat_input.click()
             random_sleep(0.1, 0.3)
@@ -584,8 +583,20 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
 
             log(f"✅ Row {i}: Message typed and sent to {number}.", "success")
             random_sleep(1, 3)
-            driver.close()
-            driver.switch_to.window(whatsapp_tab)
+            # Ensure correct tab is closed explicitly and log clearly
+            try:
+                current_tab = driver.current_window_handle
+                driver.close()
+                log(f"✅ Successfully closed WhatsApp chat tab: {current_tab}.", "info")
+            except Exception as e:
+                log(f"❌ Error closing WhatsApp chat tab: {e}", "error")
+
+            # Switch back explicitly to original WhatsApp Web tab
+            try:
+                driver.switch_to.window(whatsapp_tab)
+                log("✅ Switched back to WhatsApp Web main tab successfully.", "info")
+            except Exception as e:
+                log(f"❌ Error switching back to WhatsApp main tab: {e}", "error")
             random_sleep(2, 7)
 
             # Handle "WhatsApp open in another window" popup
