@@ -511,8 +511,10 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     log(f"⚠️ No 'Use here' popup appeared or could not be clicked during retry: {e}", "info")
 
             if not chat_loaded:
-                log(f"❌ Row {i}: WhatsApp chat did not load after {max_chat_attempts} attempts. Skipping.", "error")
-                continue  # Skip to next row if chat failed to load
+                log(f"❌ Chat did not load on attempt {chat_attempts} — explicitly closing the tab and retrying.", "warn")
+                driver.close()
+                driver.switch_to.window(whatsapp_web_tab)
+                random_sleep(1, 2)
 
             # ✅ PLACE YOUR MESSAGE GENERATION HERE, AFTER CHAT LOAD SUCCESS
             log(f"🛠️ Generating message with parameters:\n"
