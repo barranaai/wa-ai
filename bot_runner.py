@@ -455,7 +455,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                             if btn.is_displayed():
                                 btn.click()
                                 log("✅ Clicked 'Continue to Chat'")
-                                random_sleep(2, 3)
+                                random_sleep(0.5, 1)
                                 break
                     except:
                         pass
@@ -465,7 +465,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                             if btn.is_displayed():
                                 btn.click()
                                 log("✅ Clicked 'Use WhatsApp Web'")
-                                random_sleep(2, 3)
+                                random_sleep(0.2, 0.5)
                                 break
                     except:
                         pass
@@ -499,7 +499,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 
                 # Switch explicitly back to WhatsApp Web main tab to handle popup
                 driver.switch_to.window(whatsapp_web_tab)
-                random_sleep(2, 3)
+                random_sleep(1, 2)
 
                 # Handle "Use here" popup explicitly
                 try:
@@ -508,7 +508,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     )
                     use_here_button.click()
                     log("✅ Clicked 'Use here' button on WhatsApp Web popup (retry logic).")
-                    random_sleep(2, 3)
+                    random_sleep(0.5, 1.5)
                 except Exception as e:
                     log(f"⚠️ No 'Use here' popup appeared or could not be clicked during retry: {e}", "info")
 
@@ -539,13 +539,20 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             chat_input.click()
             chat_input.click()
 
-            pyautogui.hotkey("command", "a")
-            random_sleep(0.2, 0.5)
-            pyautogui.press("backspace")
+            try:
+                # Try Windows/Linux shortcut
+                chat_input.send_keys(Keys.CONTROL + 'a')  # Select all text
+                random_sleep(0.2, 0.5)
+                chat_input.send_keys(Keys.DELETE)  # Delete selected text
+            except Exception:
+                # Fallback for Mac
+                chat_input.send_keys(Keys.COMMAND + 'a')  # For Mac compatibility
+                random_sleep(0.2, 0.5)
+                chat_input.send_keys(Keys.DELETE)  # Delete selected text
 
             # Explicitly press backspace 3 times
             for _ in range(5):
-                pyautogui.press("backspace")
+                pyautogui.press("delete")
                 random_sleep(0.5, 1.0)
 
             # Safety check for short message
@@ -598,13 +605,13 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 random_sleep(2, 3)
                 use_here_button.click()
                 log("✅ Clicked 'Use here' button on WhatsApp Web popup.")
-                random_sleep(3, 7)
+                random_sleep(1, 3)
             except Exception as e:
                 log(f"⚠️ No 'Use here' popup appeared or could not be clicked: {e}", "info")
 
             # IMPORTANT: Switch explicitly back to WCEasy tab
             wceasy_tab = driver.window_handles[1]  # assuming your WCEasy tab is second tab
-            random_sleep(1, 5)
+            random_sleep(1, 3)
             driver.switch_to.window(wceasy_tab)
             random_sleep(1, 5)
             log(f"✅ Row {i}: Successfully processed and sent message.", "success")
