@@ -414,10 +414,6 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     # Log the final href for debugging
                     log(f"🚀 Opening WhatsApp Link: {new_href}", "info")
 
-                    driver.execute_script(f"window.open('{new_href}', '_blank');")
-                    driver.switch_to.window(driver.window_handles[-1])
-                    random_sleep(3, 5)
-
                     # OPTIONAL BREAK (first-time popup allowance)
                     if message_count == 0:
                         log("⏸️ Initial pause for manual popup allowance...", "info")
@@ -431,13 +427,16 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     new_href = re.sub(r'phone=\+?\d+', f'phone={TEST_NUMBER}', original_href) if USE_TEST_NUMBER else original_href
                     '''
                     # Introduce a flag at the start (before loop)
-                    first_whatsapp_click = True
+                    # Initialize flag explicitly once outside of retry loop if first chat attempt
+                    first_whatsapp_click = (message_count == 0 and chat_attempts == 1)
+
+                    # SINGLE OPENING OF WHATSAPP LINK
                     driver.execute_script(f"window.open('{new_href}', '_blank');")
                     driver.switch_to.window(driver.window_handles[-1])
+
                     if first_whatsapp_click:
-                        log("⏳ First WhatsApp link clicked, pausing for 15 seconds for OTP allowance...", "info")
-                        time.sleep(30)  # Adjust duration as needed
-                        first_whatsapp_click = False  # Set flag to False after first use
+                        log("⏳ First WhatsApp link clicked, pausing initially for popup allowance...", "info")
+                        time.sleep(20)  # Adjust as needed
                     else:
                         random_sleep(3, 5)
 
@@ -566,11 +565,12 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             log("⌨️ Typing message manually with pyautogui...")
             for line in message.splitlines():
                 print(f"Typing line: {line}")
+                random_sleep(0.1, 0.3)
                 pyautogui.typewrite(line, interval=0.02)  # typing speed controlled here
                 pyautogui.keyDown('shift')
                 pyautogui.press('enter')  # Shift+Enter creates a newline without sending
                 pyautogui.keyUp('shift')
-                random_sleep(0.5, 1.4)
+                random_sleep(0.1, 0.5)
 
             # Explicitly click the chat box again to ensure it's focused
             chat_input.click()
