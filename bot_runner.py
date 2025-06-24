@@ -16,7 +16,7 @@ from datetime import datetime
 
 # === CONFIGURATION ===
 pyautogui.FAILSAFE = False
-USE_TEST_NUMBER = True
+USE_TEST_NUMBER = False
 TEST_NUMBER = "923226100103"  # Replace with your real test number
 
 # === LOAD ENV & OPENAI ===
