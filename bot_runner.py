@@ -535,21 +535,26 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     # Make sure we close the invalid number tab if it's still open
                     try:
                         current_tab = driver.current_window_handle
-                        if current_tab in driver.window_handles:
-                            driver.close()
-                    except:
-                        pass
+                        if current_tab != whatsapp_web_tab:
+                            if current_tab in driver.window_handles:
+                                driver.close()
+                                log("✅ Closed invalid number chat tab safely.", "info")
+                    except Exception as e:
+                        log(f"⚠️ Could not close invalid number tab: {e}", "warn")
 
-                    # Switch to WhatsApp Web tab safely (if it exists)
+                    # Now check if WhatsApp Web tab still exists before switching
                     if whatsapp_web_tab in driver.window_handles:
                         try:
                             driver.switch_to.window(whatsapp_web_tab)
-                        except:
-                            log("⚠️ Failed to switch back to WhatsApp Web after invalid number.", "warn")
+                            log("✅ Switched back to WhatsApp Web tab after invalid number.", "info")
+                        except Exception as e:
+                            log(f"❌ Could not switch to WhatsApp Web tab: {e}", "error")
+                            continue
                     else:
-                        log("⚠️ WhatsApp Web tab missing after invalid number. Exiting row gracefully...", "warn")
+                        log("❌ WhatsApp Web tab no longer available. Skipping this row safely.", "error")
+                        continue
 
-                    continue  # Skip to next row, do not continue this retry block
+                    continue  # Fully skip rest of row
                 if chat_loaded:
                     break  # Exit retry loop if successful
 
