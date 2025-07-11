@@ -508,7 +508,17 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                         log("✅ WhatsApp chat loaded quickly.")
                         break
                     except:
-                        pass  # chat box not loaded yet
+                        # Check for invalid number popup
+                        try:
+                            invalid_popup = driver.find_element(By.XPATH, "//div[contains(text(),'Phone number shared via url is invalid')]")
+                            if invalid_popup.is_displayed():
+                                log("❌ Invalid number popup detected. Skipping this number.", "error")
+                                driver.close()
+                                driver.switch_to.window(whatsapp_web_tab)
+                                chat_loaded = False  # force skip
+                                break  # Exit chat load wait loop
+                        except:
+                            pass  # popup not detected
 
                     random_sleep(0.5, 1)  # Short sleep for next retry
 
