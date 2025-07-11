@@ -554,7 +554,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     except Exception as e:
                         log(f"⚠️ No 'Use here' popup appeared or could not be clicked during retry: {e}", "info")
                         
-            if not chat_loaded:
+            if not chat_loaded and not invalid_number:
                 log(f"❌ Chat did not load on attempt {chat_attempts} — explicitly closing the tab and retrying.", "warn")
                 driver.close()
                 driver.switch_to.window(whatsapp_web_tab)
