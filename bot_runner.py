@@ -512,58 +512,56 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                             invalid_popup = driver.find_element(By.XPATH, "//div[contains(text(),'Phone number shared via url is invalid')]")
                             if invalid_popup.is_displayed():
                                 log("❌ Invalid number popup detected. Skipping this number.", "error")
-                                driver.close()
-
-                                if whatsapp_web_tab in driver.window_handles:
-                                    driver.switch_to.window(whatsapp_web_tab)
-                                else:
-                                    log("⚠️ WhatsApp Web tab missing after invalid number. Continuing safely...", "warn")
-
-                                invalid_number = True  # Set flag
-                                break  # Exit retry loop immediately
+                                invalid_number = True
+                                break  # Exit the chat loading loop immediately
                         except:
                             pass  # popup not detected
 
-                    random_sleep(0.5, 1)  # Short sleep for next retry
-
+                    random_sleep(0.5, 1)
                     time.sleep(1)
 
+                # Handle invalid number: ensure tab closed and don't continue to message generation
                 if invalid_number:
                     log(f"⚠️ Skipped Row {i} due to invalid WhatsApp number popup.", "warn")
                     message_count += 1
-
-                    # Make sure we close the invalid number tab if it's still open
+                    # Close the current tab if it's still open (and not main WA tab)
                     try:
                         current_tab = driver.current_window_handle
-                        if current_tab != whatsapp_web_tab:
-                            if current_tab in driver.window_handles:
-                                driver.close()
-                                log("✅ Closed invalid number chat tab safely.", "info")
+                        if current_tab != whatsapp_web_tab and current_tab in driver.window_handles:
+                            driver.close()
+                            log("✅ Closed invalid number chat tab safely.", "info")
                     except Exception as e:
                         log(f"⚠️ Could not close invalid number tab: {e}", "warn")
 
-                    # Now check if WhatsApp Web tab still exists before switching
+                    # Switch to WhatsApp Web tab if possible, otherwise log and skip
                     if whatsapp_web_tab in driver.window_handles:
                         try:
                             driver.switch_to.window(whatsapp_web_tab)
                             log("✅ Switched back to WhatsApp Web tab after invalid number.", "info")
                         except Exception as e:
                             log(f"❌ Could not switch to WhatsApp Web tab: {e}", "error")
-                            continue
+                            continue  # Skip to next row
                     else:
                         log("❌ WhatsApp Web tab no longer available. Skipping this row safely.", "error")
-                        continue
+                        continue  # Skip to next row
 
-                    continue  # Fully skip rest of row
+                    continue  # Always skip message typing for invalid number
+
                 if chat_loaded:
                     break  # Exit retry loop if successful
 
+                # Retry logic for chat not loaded (but not due to invalid number)
                 if not invalid_number:
                     log(f"❌ Chat did not load on attempt {chat_attempts} — closing and retrying.", "warn")
-                    driver.close()
-
-                    # Switch explicitly back to WhatsApp Web main tab to handle popup
-                    driver.switch_to.window(whatsapp_web_tab)
+                    try:
+                        driver.close()
+                    except Exception as e:
+                        log(f"⚠️ Error closing tab during retry: {e}", "warn")
+                    if whatsapp_web_tab in driver.window_handles:
+                        try:
+                            driver.switch_to.window(whatsapp_web_tab)
+                        except Exception as e:
+                            log(f"⚠️ Could not switch back to WhatsApp Web during retry: {e}", "warn")
                     random_sleep(1, 2)
 
                     # Handle "Use here" popup explicitly
@@ -719,6 +717,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
     log("🏁 All done!", "success")
     driver.quit()
     log(f"Total messages sent: {message_count}", "info")
+
 
 
 
