@@ -42,6 +42,17 @@ def get_greeting():
     hour = (datetime.utcnow().hour + 4) % 24
     return "Good Morning" if 5 <= hour < 12 else "Good Afternoon" if 12 <= hour < 17 else "Good Evening"
 
+def handle_use_here(driver, log):
+    try:
+        use_here_button = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, "//div[text()='Use here']"))
+        )
+        use_here_button.click()
+        log("✅ Clicked 'Use here' button on WhatsApp Web.", "info")
+        random_sleep(1, 2)
+    except Exception as e:
+        log("ℹ️ No 'Use here' popup appeared after switching to WhatsApp Web tab.", "info")
+
 
 def generate_ai_message(full_name, last_name, building_name, unit_number, property_type, prompt=None, retries=2):
     greeting = get_greeting()
@@ -524,7 +535,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 if invalid_number:
                     log(f"⚠️ Skipped Row {i} due to invalid WhatsApp number popup.", "warn")
                     message_count += 1
-                    # Close the current tab if it's still open (and not main WA tab)
+                    # Close the invalid chat tab if still open (and not main WA tab)
                     try:
                         current_tab = driver.current_window_handle
                         if current_tab != whatsapp_web_tab and current_tab in driver.window_handles:
@@ -533,11 +544,13 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     except Exception as e:
                         log(f"⚠️ Could not close invalid number tab: {e}", "warn")
 
-                    # Switch to WhatsApp Web tab if possible, otherwise log and skip
+                    # Switch to WhatsApp Web tab and handle "Use here"
                     if whatsapp_web_tab in driver.window_handles:
                         try:
                             driver.switch_to.window(whatsapp_web_tab)
                             log("✅ Switched back to WhatsApp Web tab after invalid number.", "info")
+                            # PATCH: Always handle 'Use here' after invalid number
+                            handle_use_here(driver, log)
                         except Exception as e:
                             log(f"❌ Could not switch to WhatsApp Web tab: {e}", "error")
                             continue  # Skip to next row
