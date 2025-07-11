@@ -531,7 +531,25 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 if invalid_number:
                     log(f"⚠️ Skipped Row {i} due to invalid WhatsApp number popup.", "warn")
                     message_count += 1
-                    break  # Exit retry loop fully (no more retries or cleanup for this row)
+
+                    # Make sure we close the invalid number tab if it's still open
+                    try:
+                        current_tab = driver.current_window_handle
+                        if current_tab in driver.window_handles:
+                            driver.close()
+                    except:
+                        pass
+
+                    # Switch to WhatsApp Web tab safely (if it exists)
+                    if whatsapp_web_tab in driver.window_handles:
+                        try:
+                            driver.switch_to.window(whatsapp_web_tab)
+                        except:
+                            log("⚠️ Failed to switch back to WhatsApp Web after invalid number.", "warn")
+                    else:
+                        log("⚠️ WhatsApp Web tab missing after invalid number. Exiting row gracefully...", "warn")
+
+                    continue  # Skip to next row, do not continue this retry block
                 if chat_loaded:
                     break  # Exit retry loop if successful
 
