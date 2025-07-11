@@ -465,8 +465,6 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 # Start checking if chat loads
                 start = time.time()
                 chat_loaded = False
-
-                chat_loaded = False
                 max_wait_time = 20
                 end_time = time.time() + max_wait_time
                 invalid_number = False  # Flag to track invalid popup
@@ -533,29 +531,29 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 if invalid_number:
                     log(f"⚠️ Skipped Row {i} due to invalid WhatsApp number popup.", "warn")
                     message_count += 1
-                    continue  # Move to next row
+                    break  # Exit retry loop fully (no more retries or cleanup for this row)
                 if chat_loaded:
                     break  # Exit retry loop if successful
 
-                # Chat did not load, close WhatsApp tab explicitly and handle popup explicitly
-                log(f"❌ Chat did not load on attempt {chat_attempts} — closing and retrying.", "warn")
-                driver.close()
-                
-                # Switch explicitly back to WhatsApp Web main tab to handle popup
-                driver.switch_to.window(whatsapp_web_tab)
-                random_sleep(1, 2)
+                if not invalid_number:
+                    log(f"❌ Chat did not load on attempt {chat_attempts} — closing and retrying.", "warn")
+                    driver.close()
 
-                # Handle "Use here" popup explicitly
-                try:
-                    use_here_button = WebDriverWait(driver, 10).until(
-                        EC.element_to_be_clickable((By.XPATH, "//div[text()='Use here']"))
-                    )
-                    use_here_button.click()
-                    log("✅ Clicked 'Use here' button on WhatsApp Web popup (retry logic).")
-                    random_sleep(0.5, 1.5)
-                except Exception as e:
-                    log(f"⚠️ No 'Use here' popup appeared or could not be clicked during retry: {e}", "info")
+                    # Switch explicitly back to WhatsApp Web main tab to handle popup
+                    driver.switch_to.window(whatsapp_web_tab)
+                    random_sleep(1, 2)
 
+                    # Handle "Use here" popup explicitly
+                    try:
+                        use_here_button = WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, "//div[text()='Use here']"))
+                        )
+                        use_here_button.click()
+                        log("✅ Clicked 'Use here' button on WhatsApp Web popup (retry logic).")
+                        random_sleep(0.5, 1.5)
+                    except Exception as e:
+                        log(f"⚠️ No 'Use here' popup appeared or could not be clicked during retry: {e}", "info")
+                        
             if not chat_loaded:
                 log(f"❌ Chat did not load on attempt {chat_attempts} — explicitly closing the tab and retrying.", "warn")
                 driver.close()
