@@ -117,26 +117,35 @@ def normalize_name(text):
 
 def scroll_to_load_all_rows(driver, pause_time=2, max_attempts=20):
     attempts = 0
+    try:
+        wrapper = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "tableWraper"))
+        )
+    except:
+        log("❌ tableWraper not found for scrolling.", "error")
+        return
+
     while attempts < max_attempts:
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", wrapper)
         random_sleep(pause_time, pause_time + 1)
 
         try:
             all_loaded = driver.find_element(By.XPATH, "//div[@class='elseDesign1' and contains(.,'All Data Loaded')]")
             if all_loaded.is_displayed():
-                log("✅ All Data Loaded element detected. Scrolling complete.", "success")
+                log("✅ 'All Data Loaded' element detected. Scrolling complete.", "success")
                 break
         except:
-            log("⏳ 'All Data Loaded' element not detected yet. Continuing to scroll...", "info")
+            log(f"⏳ Scroll attempt {attempts+1}: 'All Data Loaded' not found yet...", "info")
 
         attempts += 1
+
     else:
         log("⚠️ Max scrolling attempts reached. Some data may not have loaded fully.", "warn")
 
-    # Scroll explicitly back to top
-    driver.execute_script("window.scrollTo(0, 0);")
+    # Scroll back to top
+    driver.execute_script("arguments[0].scrollTop = 0", wrapper)
     random_sleep(1, 2)
-    log("✅ Scrolled back to the top.", "info")
+    log("✅ Scrolled back to top of table.", "info")
 
 def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] = None, prompt: str = None, log_fn=None):
     def log(msg, tag=None):
