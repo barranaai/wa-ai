@@ -621,7 +621,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 log("❌ WhatsApp Web tab no longer exists. Aborting safely.", "error")
                 driver.quit()
                 return
-            random_sleep(2, 7)
+            random_sleep(1, 3)
 
             # Handle "WhatsApp open in another window" popup
             
@@ -631,7 +631,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 if continue_btn.is_displayed():
                     continue_btn.click()
                     log("✅ Clicked 'Continue' button popup")
-                    random_sleep(3, 8)
+                    random_sleep(1, 3)
             except:
                 pass
             
@@ -639,10 +639,10 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                 use_here_button = WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((By.XPATH, "//div[text()='Use here']"))
                 )
-                random_sleep(2, 3)
+                random_sleep(1, 2)
                 use_here_button.click()
                 log("✅ Clicked 'Use here' button on WhatsApp Web popup.")
-                random_sleep(1, 3)
+                random_sleep(1, 2)
             except Exception as e:
                 log(f"⚠️ No 'Use here' popup appeared or could not be clicked: {e}", "info")
 
@@ -650,7 +650,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             wceasy_tab = driver.window_handles[1]  # assuming your WCEasy tab is second tab
             random_sleep(1, 3)
             driver.switch_to.window(wceasy_tab)
-            random_sleep(1, 5)
+            random_sleep(1, 3)
             log(f"✅ Row {i}: Successfully processed and sent message.", "success")
             message_count += 1
             if message_count % 10 == 0:
