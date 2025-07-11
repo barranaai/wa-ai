@@ -412,7 +412,9 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     original_href = whatsapp_link.get_attribute('href').strip()
 
                     # Ensure WhatsApp Web format explicitly
+                    # Ensure WhatsApp Web format explicitly
                     new_href = original_href.replace("whatsapp://", "https://web.whatsapp.com/")
+                    new_href = new_href.replace("api.whatsapp.com", "web.whatsapp.com")
 
                     # Replace phone number explicitly with clean TEST_NUMBER
                     new_href = re.sub(r'(phone=\+?[\d]+)', f'phone={TEST_NUMBER}', new_href) if USE_TEST_NUMBER else original_href
