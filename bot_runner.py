@@ -411,16 +411,23 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                     #for live server, replace with web.whatsapp.com    
                     original_href = whatsapp_link.get_attribute('href').strip()
 
-                    # Ensure WhatsApp Web format explicitly
-                    # Ensure WhatsApp Web format explicitly
-                    new_href = original_href.replace("whatsapp://", "https://web.whatsapp.com/")
-                    new_href = new_href.replace("api.whatsapp.com", "web.whatsapp.com")
+                    # Extract number and text from original href
+                    parsed_number = re.search(r'phone=(\+?\d+)', original_href)
+                    parsed_text = re.search(r'text=([^&]+)', original_href)
 
-                    # Replace phone number explicitly with clean TEST_NUMBER
-                    new_href = re.sub(r'(phone=\+?[\d]+)', f'phone={TEST_NUMBER}', new_href) if USE_TEST_NUMBER else original_href
+                    number = parsed_number.group(1) if parsed_number else TEST_NUMBER
+                    text = parsed_text.group(1) if parsed_text else "Hi"
 
-                    # Remove unwanted URL encodings and whitespace explicitly
-                    new_href = re.sub(r'(%20|\s)+', '', new_href)
+                    # Use test number if required
+                    final_number = TEST_NUMBER if USE_TEST_NUMBER else number
+
+                    # Clean text (preserve spacing and encoding)
+                    safe_text = re.sub(r'\s+', '%20', text.strip())
+
+                    # Construct clean URL for WhatsApp Web
+                    new_href = f"https://web.whatsapp.com/send?phone={final_number}&text={safe_text}"
+
+                    log(f"🔗 Cleaned WhatsApp URL: {new_href}", "info")
 
                     # Log the final href for debugging
                     log(f"🚀 Opening WhatsApp Link: {new_href}", "info")
