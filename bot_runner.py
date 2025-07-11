@@ -514,9 +514,16 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
                             if invalid_popup.is_displayed():
                                 log("❌ Invalid number popup detected. Skipping this number.", "error")
                                 driver.close()
-                                driver.switch_to.window(whatsapp_web_tab)
-                                chat_loaded = False  # force skip
-                                break  # Exit chat load wait loop
+                                
+                                # Safely switch back to WhatsApp Web tab if available
+                                if whatsapp_web_tab in driver.window_handles:
+                                    driver.switch_to.window(whatsapp_web_tab)
+                                else:
+                                    log("⚠️ WhatsApp Web tab missing after invalid number. Continuing safely...", "warn")
+
+                                chat_loaded = False
+                                message_count += 1  # Optional: Count this as a processed record
+                                continue  # Skip rest of this row
                         except:
                             pass  # popup not detected
 
