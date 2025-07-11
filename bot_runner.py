@@ -599,20 +599,28 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
 
             log(f"✅ Row {i}: Message typed and sent to {number}.", "success")
             random_sleep(1, 3)
-            # Ensure correct tab is closed explicitly and log clearly
+            # === Safe tab closing and tab switching ===
             try:
                 current_tab = driver.current_window_handle
-                driver.close()
-                log(f"✅ Successfully closed WhatsApp chat tab: {current_tab}.", "info")
+                if current_tab in driver.window_handles:
+                    driver.close()
+                    log(f"✅ Closed WhatsApp chat tab: {current_tab}", "success")
+                else:
+                    log("⚠️ WhatsApp chat tab already closed or not in handle list.", "warn")
             except Exception as e:
-                log(f"❌ Error closing WhatsApp chat tab: {e}", "error")
+                log(f"❌ Error while trying to close WhatsApp chat tab: {e}", "error")
 
-            # Switch back explicitly to original WhatsApp Web tab
-            try:
-                driver.switch_to.window(whatsapp_tab)
-                log("✅ Switched back to WhatsApp Web main tab successfully.", "info")
-            except Exception as e:
-                log(f"❌ Error switching back to WhatsApp main tab: {e}", "error")
+            # Switch back to WhatsApp Web tab if still available
+            if whatsapp_tab in driver.window_handles:
+                try:
+                    driver.switch_to.window(whatsapp_tab)
+                    log("✅ Switched back to WhatsApp Web main tab.", "info")
+                except Exception as e:
+                    log(f"❌ Error switching to WhatsApp Web tab: {e}", "error")
+            else:
+                log("❌ WhatsApp Web tab no longer exists. Aborting safely.", "error")
+                driver.quit()
+                return
             random_sleep(2, 7)
 
             # Handle "WhatsApp open in another window" popup
