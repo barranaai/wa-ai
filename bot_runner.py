@@ -13,6 +13,7 @@ from login import login_google
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from datetime import datetime
+import csv
 
 # === CONFIGURATION ===
 pyautogui.FAILSAFE = False
@@ -26,6 +27,27 @@ client = OpenAI(api_key=openai_api_key)
 
 # === LOGGING SETUP ===
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bot_run_log.txt")
+
+CSV_LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "whatsapp_sent_messages.csv")
+
+def log_sent_message(sheet, tab, name, number, message, status="SENT"):
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    row = {
+        'sheet': sheet,
+        'tab': tab,
+        'name': name,
+        'number': number,
+        'message': message,
+        'datetime': now,
+        'status': status,
+    }
+    # Write header only if file does not exist yet
+    file_exists = os.path.isfile(CSV_LOG_FILE)
+    with open(CSV_LOG_FILE, "a", newline="", encoding="utf-8") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=row.keys())
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(row)
 
 def log(msg, tag=None):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -568,6 +590,14 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             # Final skip check after all attempts (if chat not loaded or invalid)
             if skip_row:
                 log(f"⚠️ Skipped Row {i} due to invalid WhatsApp number popup.", "warn")
+                log_sent_message(
+                    sheet=selected_sheet_name,
+                    tab=tab_name,
+                    name=full_name,
+                    number=number,
+                    message="SKIPPED - Invalid Number",
+                    status="SKIPPED"
+                )
                 message_count += 1
 
                 # Switch back to WCEasy tab before continuing
@@ -661,6 +691,14 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             pyautogui.keyUp('enter')
 
             log(f"✅ Row {i}: Message typed and sent to {number}.", "success")
+            log_sent_message(
+                sheet=selected_sheet_name,
+                tab=tab_name,
+                name=full_name,
+                number=number,
+                message=message,
+                status="SENT"
+            )
             random_sleep(1, 3)
             # === Safe tab closing and tab switching ===
             try:
