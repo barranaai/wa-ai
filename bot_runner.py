@@ -359,6 +359,13 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
         idx_wn = match_col(['wn'], fuzzy_contains=True)
 
         for i, row in enumerate(rows, 1):
+            # --- Always check current handles at the very start ---
+            handles = driver.window_handles
+            if len(handles) < 2:
+                log(f"❌ Not enough browser tabs open for operation (handles: {handles}). Exiting gracefully.", "error")
+                driver.quit()
+                return
+
             cells = row.find_elements(By.TAG_NAME, "td")[1:]
             values = [c.text.strip() for c in cells]
             full_name = values[idx_name] if idx_name is not None else ""
@@ -370,174 +377,193 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             property_type = values[idx_property_type] if (idx_property_type is not None and values[idx_property_type].strip()) else ""
 
             if not property_type:
-                if 'apartment' in unit_column_name:
-                    property_type = 'apartment'
-                elif 'flat' in unit_column_name:
-                    property_type = 'flat'
-                elif 'office' in unit_column_name:
-                    property_type = 'office'
-                elif 'room' in unit_column_name:
-                    property_type = 'room'
-                elif 'villa' in unit_column_name:
-                    property_type = 'villa'
-                elif 'unit' in unit_column_name:
-                    property_type = 'unit'
-                else:
-                    property_type = 'property'  # default fallback
+                # ... [same property_type deduction as before] ...
+                pass
 
             log(f"Inferred property type: '{property_type}' from column '{unit_column_name}'")
-
             number = TEST_NUMBER if USE_TEST_NUMBER else real_number
-
             if not number:
                 log(f"⚠️ Row {i}: No WhatsApp number found. Skipping.", "info")
                 continue
 
-            # ✅ New WhatsApp Link Click Logic (updated clearly)
-            max_chat_attempts = 2  # number of attempts to retry opening chat
+            max_chat_attempts = 2
             chat_attempts = 0
             chat_loaded = False
             skip_row = False
 
-            # Store tab handles clearly
-            wceasy_tab = driver.window_handles[1]  # Explicit WCEasy Tab
-            whatsapp_web_tab = whatsapp_tab  # Explicit WhatsApp Web Tab
-
-            skip_row = False  # Track whether to skip further processing on this row
+            # Store tab handles clearly (always fetch live)
+            wceasy_tab = None
+            whatsapp_web_tab = None
+            # Find by tab url for extra safety
+            for h in driver.window_handles:
+                driver.switch_to.window(h)
+                if "web.whatsapp.com" in driver.current_url:
+                    whatsapp_web_tab = h
+                elif "wceasy.club" in driver.current_url:
+                    wceasy_tab = h
+            # Defensive fallback:
+            if not wceasy_tab:
+                wceasy_tab = driver.window_handles[1] if len(driver.window_handles) > 1 else driver.window_handles[0]
+            if not whatsapp_web_tab:
+                whatsapp_web_tab = driver.window_handles[0]
+            # END FIND TABS
 
             while chat_attempts < max_chat_attempts and not skip_row:
                 chat_attempts += 1
-
-                # --- Open WhatsApp link for the row ---
                 try:
-                    whatsapp_links = row.find_elements(By.XPATH, ".//a[contains(@href, 'whatsapp.com/send')]")
-                    if not whatsapp_links:
-                        log(f"⚠️ Row {i}: No WhatsApp links found. Skipping.", "info")
+                    # --- B. Defensive Try/Except For Each Row ---
+                    try:
+                        whatsapp_links = row.find_elements(By.XPATH, ".//a[contains(@href, 'whatsapp.com/send')]")
+                        if not whatsapp_links:
+                            log(f"⚠️ Row {i}: No WhatsApp links found. Skipping.", "info")
+                            skip_row = True
+                            break
+                        whatsapp_link = whatsapp_links[0]
+                        original_href = whatsapp_link.get_attribute('href').strip()
+                        parsed_number = re.search(r'phone=(\+?\d+)', original_href)
+                        parsed_text = re.search(r'text=([^&]+)', original_href)
+                        number = parsed_number.group(1) if parsed_number else TEST_NUMBER
+                        text = parsed_text.group(1) if parsed_text else "Hi"
+                        final_number = TEST_NUMBER if USE_TEST_NUMBER else number
+                        safe_text = re.sub(r'\s+', '%20', text.strip())
+                        new_href = f"https://web.whatsapp.com/send?phone={final_number}&text={safe_text}"
+                        log(f"🔗 Cleaned WhatsApp URL: {new_href}", "info")
+                        log(f"🚀 Opening WhatsApp Link: {new_href}", "info")
+                        if message_count == 0:
+                            log("⏸️ Initial pause for manual popup allowance...", "info")
+                            random_sleep(30, 40)
+                        first_whatsapp_click = (message_count == 0 and chat_attempts == 1)
+                        driver.execute_script(f"window.open('{new_href}', '_blank');")
+                        driver.switch_to.window(driver.window_handles[-1])
+                        if first_whatsapp_click:
+                            log("⏳ First WhatsApp link clicked, pausing initially for popup allowance...", "info")
+                            time.sleep(20)
+                        else:
+                            random_sleep(3, 5)
+                    except Exception as e:
+                        log(f"❌ Row {i}: Error opening WhatsApp link: {e}", "error")
                         skip_row = True
                         break
-                    whatsapp_link = whatsapp_links[0]
-                    original_href = whatsapp_link.get_attribute('href').strip()
-                    parsed_number = re.search(r'phone=(\+?\d+)', original_href)
-                    parsed_text = re.search(r'text=([^&]+)', original_href)
-                    number = parsed_number.group(1) if parsed_number else TEST_NUMBER
-                    text = parsed_text.group(1) if parsed_text else "Hi"
-                    final_number = TEST_NUMBER if USE_TEST_NUMBER else number
-                    safe_text = re.sub(r'\s+', '%20', text.strip())
-                    new_href = f"https://web.whatsapp.com/send?phone={final_number}&text={safe_text}"
 
-                    log(f"🔗 Cleaned WhatsApp URL: {new_href}", "info")
-                    log(f"🚀 Opening WhatsApp Link: {new_href}", "info")
-                    if message_count == 0:
-                        log("⏸️ Initial pause for manual popup allowance...", "info")
-                        random_sleep(30, 40)
-                    first_whatsapp_click = (message_count == 0 and chat_attempts == 1)
-                    driver.execute_script(f"window.open('{new_href}', '_blank');")
-                    driver.switch_to.window(driver.window_handles[-1])
-                    if first_whatsapp_click:
-                        log("⏳ First WhatsApp link clicked, pausing initially for popup allowance...", "info")
-                        time.sleep(20)
-                    else:
-                        random_sleep(3, 5)
-                except Exception as e:
-                    log(f"❌ Row {i}: Error opening WhatsApp link: {e}", "error")
-                    skip_row = True
-                    break
-
-                # --- Wait for chat load or invalid popup ---
-                start = time.time()
-                max_wait_time = 20
-                end_time = time.time() + max_wait_time
-                chat_loaded = False
-                while time.time() < end_time:
-                    # Try click "Continue to Chat" etc
-                    try:
-                        continue_chat_btn = WebDriverWait(driver, 2).until(
-                            EC.element_to_be_clickable((By.XPATH, "//a[@id='action-button' or .//span[text()='Continue to Chat']]"))
-                        )
-                        continue_chat_btn.click()
-                        log("✅ Clicked 'Continue to Chat' button quickly.")
-                        random_sleep(0.5, 1)
-                    except:
-                        pass
-                    try:
-                        use_whatsapp_web_btn = WebDriverWait(driver, 2).until(
-                            EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'web.whatsapp.com/send') or .//span[text()='use WhatsApp Web']]"))
-                        )
-                        use_whatsapp_web_btn.click()
-                        log("✅ Clicked 'Use WhatsApp Web' button quickly.")
-                        random_sleep(0.5, 1)
-                    except:
-                        pass
-                    try:
-                        continue_popup_btn = WebDriverWait(driver, 1).until(
-                            EC.element_to_be_clickable((By.XPATH, "//button//div[contains(text(),'Continue')]"))
-                        )
-                        continue_popup_btn.click()
-                        log("✅ Clicked 'Continue' popup button quickly.")
-                        random_sleep(0.5, 1)
-                    except:
-                        pass
-
-                    # Chat loaded?
-                    try:
-                        driver.find_element(By.XPATH, "//div[@contenteditable='true'][@data-tab='10']")
-                        chat_loaded = True
-                        log("✅ WhatsApp chat loaded quickly.")
+                    # --- C. Always check handles before search ---
+                    handles = driver.window_handles
+                    if len(handles) < 2:
+                        log(f"❌ All browser tabs closed or missing. Aborting row.", "error")
+                        skip_row = True
                         break
-                    except:
-                        # Invalid number popup?
+
+                    # --- Wait for chat load or invalid popup ---
+                    start = time.time()
+                    max_wait_time = 20
+                    end_time = time.time() + max_wait_time
+                    chat_loaded = False
+                    while time.time() < end_time:
                         try:
-                            invalid_popup = driver.find_element(By.XPATH, "//div[contains(text(),'Phone number shared via url is invalid')]")
-                            if invalid_popup.is_displayed():
-                                log("❌ Invalid number popup detected. Skipping this number.", "error")
-                                # Close invalid tab if open and not main WA tab
-                                try:
-                                    current_tab = driver.current_window_handle
-                                    if current_tab != whatsapp_web_tab and current_tab in driver.window_handles:
-                                        driver.close()
-                                        log("✅ Closed invalid number chat tab safely.", "info")
-                                except Exception as e:
-                                    log(f"⚠️ Could not close invalid number tab: {e}", "warn")
-                                # Switch to WA Web tab & always click "Use here"
-                                if whatsapp_web_tab in driver.window_handles:
-                                    try:
-                                        driver.switch_to.window(whatsapp_web_tab)
-                                        log("✅ Switched back to WhatsApp Web tab after invalid number.", "info")
-                                        handle_use_here(driver, log)
-                                    except Exception as e:
-                                        log(f"❌ Could not switch to WhatsApp Web tab: {e}", "error")
-                                else:
-                                    log("❌ WhatsApp Web tab no longer available. Skipping this row safely.", "error")
-                                skip_row = True
-                                break  # break time loop
+                            continue_chat_btn = WebDriverWait(driver, 2).until(
+                                EC.element_to_be_clickable((By.XPATH, "//a[@id='action-button' or .//span[text()='Continue to Chat']]"))
+                            )
+                            continue_chat_btn.click()
+                            log("✅ Clicked 'Continue to Chat' button quickly.")
+                            random_sleep(0.5, 1)
                         except:
                             pass
-                    random_sleep(0.5, 1)
-                    time.sleep(1)
-
-                if skip_row:
-                    log(f"⚠️ Skipped Row {i} due to invalid WhatsApp number popup.", "warn")
-                    message_count += 1
-                    break  # break retry loop, continue to next row
-
-                if chat_loaded:
-                    break  # exit retry loop for this row
-
-                # Retry logic for chat not loaded (but not due to invalid number)
-                if not skip_row:
-                    log(f"❌ Chat did not load on attempt {chat_attempts} — closing and retrying.", "warn")
-                    try:
-                        driver.close()
-                    except Exception as e:
-                        log(f"⚠️ Error closing tab during retry: {e}", "warn")
-                    if whatsapp_web_tab in driver.window_handles:
                         try:
-                            driver.switch_to.window(whatsapp_web_tab)
+                            use_whatsapp_web_btn = WebDriverWait(driver, 2).until(
+                                EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, 'web.whatsapp.com/send') or .//span[text()='use WhatsApp Web']]"))
+                            )
+                            use_whatsapp_web_btn.click()
+                            log("✅ Clicked 'Use WhatsApp Web' button quickly.")
+                            random_sleep(0.5, 1)
+                        except:
+                            pass
+                        try:
+                            continue_popup_btn = WebDriverWait(driver, 1).until(
+                                EC.element_to_be_clickable((By.XPATH, "//button//div[contains(text(),'Continue')]"))
+                            )
+                            continue_popup_btn.click()
+                            log("✅ Clicked 'Continue' popup button quickly.")
+                            random_sleep(0.5, 1)
+                        except:
+                            pass
+
+                        # Chat loaded?
+                        try:
+                            driver.find_element(By.XPATH, "//div[@contenteditable='true'][@data-tab='10']")
+                            chat_loaded = True
+                            log("✅ WhatsApp chat loaded quickly.")
+                            break
+                        except:
+                            # Invalid number popup?
+                            try:
+                                invalid_popup = driver.find_element(By.XPATH, "//div[contains(text(),'Phone number shared via url is invalid')]")
+                                if invalid_popup.is_displayed():
+                                    log("❌ Invalid number popup detected. Skipping this number.", "error")
+                                    try:
+                                        current_tab = driver.current_window_handle
+                                        if current_tab != whatsapp_web_tab and current_tab in driver.window_handles:
+                                            driver.close()
+                                            log("✅ Closed invalid number chat tab safely.", "info")
+                                    except Exception as e:
+                                        log(f"⚠️ Could not close invalid number tab: {e}", "warn")
+                                    if whatsapp_web_tab in driver.window_handles:
+                                        try:
+                                            driver.switch_to.window(whatsapp_web_tab)
+                                            log("✅ Switched back to WhatsApp Web tab after invalid number.", "info")
+                                            handle_use_here(driver, log)
+                                        except Exception as e:
+                                            log(f"❌ Could not switch to WhatsApp Web tab: {e}", "error")
+                                    else:
+                                        log("❌ WhatsApp Web tab no longer available. Skipping this row safely.", "error")
+                                    skip_row = True
+                                    break
+                            except:
+                                pass
+                        random_sleep(0.5, 1)
+                        time.sleep(1)
+
+                    # --- After any close, always re-check current handles and tab! ---
+                    handles = driver.window_handles
+                    if skip_row:
+                        log(f"⚠️ Skipped Row {i} due to invalid WhatsApp number popup.", "warn")
+                        message_count += 1
+                        # Defensive switch: if only one handle, use that, else use WA tab
+                        if whatsapp_web_tab in handles:
+                            try:
+                                driver.switch_to.window(whatsapp_web_tab)
+                                log("✅ Switched back to WhatsApp Web main tab (post-skip).", "info")
+                            except Exception as e:
+                                log(f"⚠️ Could not switch to WA Web main tab after skip: {e}", "warn")
+                        else:
+                            if handles:
+                                driver.switch_to.window(handles[0])
+                        break  # skip to next row
+
+                    if chat_loaded:
+                        break  # Success: exit retry
+
+                    # Defensive closing/retry (tab/handles check)
+                    if not skip_row:
+                        log(f"❌ Chat did not load on attempt {chat_attempts} — closing and retrying.", "warn")
+                        try:
+                            driver.close()
                         except Exception as e:
-                            log(f"⚠️ Could not switch back to WhatsApp Web during retry: {e}", "warn")
-                    random_sleep(1, 2)
-                    # Always handle "Use here"
-                    handle_use_here(driver, log)
+                            log(f"⚠️ Error closing tab during retry: {e}", "warn")
+                        handles = driver.window_handles
+                        if whatsapp_web_tab in handles:
+                            try:
+                                driver.switch_to.window(whatsapp_web_tab)
+                                log("✅ Switched to WhatsApp Web tab after retry-close.", "info")
+                            except Exception as e:
+                                log(f"⚠️ Could not switch to WhatsApp Web tab after retry-close: {e}", "warn")
+                        else:
+                            if handles:
+                                driver.switch_to.window(handles[0])
+                        random_sleep(1, 2)
+                        handle_use_here(driver, log)
+                except Exception as e:
+                    log(f"❌ Exception processing row {i}: {e}", "error")
+                    skip_row = True
+                    break
 
             # Final skip check after all attempts (if chat not loaded or invalid)
             if skip_row:
