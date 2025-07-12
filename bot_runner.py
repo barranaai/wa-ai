@@ -567,17 +567,22 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
 
             # Final skip check after all attempts (if chat not loaded or invalid)
             if skip_row:
-                    # Always switch to WCEasy tab before continuing to the next row
-                handles = driver.window_handles
+                log(f"⚠️ Skipped Row {i} due to invalid WhatsApp number popup.", "warn")
+                message_count += 1
+
+                # Switch back to WCEasy tab before continuing
                 wceasy_tab_found = False
-                for h in handles:
-                    driver.switch_to.window(h)
-                    if "wceasy.club" in driver.current_url:
-                        wceasy_tab_found = True
-                        log("✅ Switched to WCEasy tab after skipping invalid number row.", "info")
-                        break
+                for h in driver.window_handles:
+                    try:
+                        driver.switch_to.window(h)
+                        if "wceasy.club" in driver.current_url:
+                            wceasy_tab_found = True
+                            log("✅ Switched to WCEasy tab after skip.", "info")
+                            break
+                    except Exception as e:
+                        log(f"⚠️ Error while switching to WCEasy tab after skip: {e}", "warn")
                 if not wceasy_tab_found:
-                    log("❌ WCEasy tab not found after skip. Aborting.", "error")
+                    log("❌ WCEasy tab not found after skip. Aborting script.", "error")
                     driver.quit()
                     return
                 continue  # skip to next row, do NOT send message for this row
