@@ -207,8 +207,8 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
 
     Omar Bayat
     White & Co. Real Estate
-
-    Slightly vary the wording professionally for each message. Output ONLY the final message.
+    ---
+    Output ONLY the final message.
     """
 
     normalized_selected_tabs = [normalize_name(t) for t in selected_tabs] if selected_tabs else []

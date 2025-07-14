@@ -72,8 +72,8 @@ class WhatsAppBotGUI:
 
         Omar Bayat
         White & Co. Real Estate
-
-        Slightly vary the wording professionally for each message. Output ONLY the final message.
+        ---
+        Output ONLY the final message.
 """)
 
         # Run button
