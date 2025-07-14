@@ -17,7 +17,7 @@ import csv
 
 # === CONFIGURATION ===
 pyautogui.FAILSAFE = False
-USE_TEST_NUMBER = False
+USE_TEST_NUMBER = True
 TEST_NUMBER = "923226100103"  # Replace with your real test number
 
 # === LOAD ENV & OPENAI ===
@@ -88,23 +88,29 @@ def generate_ai_message(full_name, last_name, building_name, unit_number, proper
                 break
     else:
         unit_term = "property"
+    
+    # *** ONLY show the unit number, NOT the building ***
+    if unit_number:
+        unit_info = f"{unit_term} {unit_number}"
+    else:
+        unit_info = f"{unit_term}"
 
-    unit_info = f"your {unit_term} {unit_number} in {building_name}" if unit_number and building_name else \
-                f"your {unit_term} in {building_name}" if building_name else \
-                f"your {unit_term} {unit_number}" if unit_number else f"your {unit_term}"
+    #unit_info = f"your {unit_term} {unit_number} in {building_name}" if unit_number and building_name else \
+    #            f"your {unit_term} in {building_name}" if building_name else \
+     #           f"your {unit_term} {unit_number}" if unit_number else f"your {unit_term}"
     if prompt is None:
         prompt = """
 Write a professional WhatsApp message for a property agent reaching out to a landlord.
 
 Start the message with: Greetings.
 
-My name is Omar Bayat, and I am a Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
+My name is Omar Bayat, and I'm a Property Consultant at White & Co., one of Dubai's leading British-owned brokerages.
 
-I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
+I'm reaching out regarding Unit {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
 
 Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
 
-If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
+If it's already occupied, please feel free to save my details for future opportunities. I'd be happy to assist when the time is right.
 
 Best regards,
 
@@ -196,13 +202,13 @@ Write a professional WhatsApp message for a property agent reaching out to a lan
 
 Start the message with: Greetings.
 
-My name is Omar Bayat, and I am a Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
+My name is Omar Bayat, and I'm a Property Consultant at White & Co., one of Dubai's leading British-owned brokerages.
 
-I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
+I'm reaching out regarding Unit {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
 
 Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
 
-If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
+If it's already occupied, please feel free to save my details for future opportunities. I'd be happy to assist when the time is right.
 
 Best regards,
 

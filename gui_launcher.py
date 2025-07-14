@@ -61,13 +61,13 @@ Write a professional WhatsApp message for a property agent reaching out to a lan
 
 Start the message with: Greetings.
 
-My name is Omar Bayat, and I am a Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
+My name is Omar Bayat, and I'm a Property Consultant at White & Co., one of Dubai's leading British-owned brokerages.
 
-I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
+I'm reaching out regarding Unit {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
 
 Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
 
-If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
+If it's already occupied, please feel free to save my details for future opportunities. I'd be happy to assist when the time is right.
 
 Best regards,
 
