@@ -94,23 +94,24 @@ def generate_ai_message(full_name, last_name, building_name, unit_number, proper
                 f"your {unit_term} {unit_number}" if unit_number else f"your {unit_term}"
     if prompt is None:
         prompt = """
-        ---
-    Greetings. My name is Omar Bayat, and I am Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
+Write a professional WhatsApp message for a property agent reaching out to a landlord.
 
-    I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
+Start the message with: Greetings.
 
-    Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
+My name is Omar Bayat, and I am a Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
 
-    If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
+I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
 
-    Looking forward to hearing from you.
+Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
 
-    Best regards,
+If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
 
-    Omar Bayat
-    White & Co. Real Estate
+Best regards,
 
-    Output ONLY the final message. Output ONLY the final message.
+Omar Bayat
+White & Co. Real Estate
+
+Output the entire message only. Do not summarize, do not skip the introduction or closing.
         """
     formatted_prompt = prompt.format(
         unit_info=unit_info
@@ -191,23 +192,24 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
         log("🔴 No prompt received. Using fallback.", "error")
 
     fallback_prompt = """
-    ---
-    Greetings. My name is Omar Bayat, and I am Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
+Write a professional WhatsApp message for a property agent reaching out to a landlord.
 
-    I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
+Start the message with: Greetings.
 
-    Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
+My name is Omar Bayat, and I am a Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
 
-    If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
+I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
 
-    Looking forward to hearing from you.
+Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
 
-    Best regards,
+If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
 
-    Omar Bayat
-    White & Co. Real Estate
+Best regards,
 
-    Output ONLY the final message.
+Omar Bayat
+White & Co. Real Estate
+
+Output the entire message only. Do not summarize, do not skip the introduction or closing.
     """
 
     normalized_selected_tabs = [normalize_name(t) for t in selected_tabs] if selected_tabs else []

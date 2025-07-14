@@ -57,23 +57,24 @@ class WhatsAppBotGUI:
         self.prompt_text = tk.Text(root, height=15, width=90)
         self.prompt_text.pack(padx=10, pady=5)
         self.prompt_text.insert("1.0", """
-        ---
-        Greetings. My name is Omar Bayat, and I am Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
+Write a professional WhatsApp message for a property agent reaching out to a landlord.
 
-        I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
+Start the message with: Greetings.
 
-        Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
+My name is Omar Bayat, and I am a Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
 
-        If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
+I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
 
-        Looking forward to hearing from you.
+Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
 
-        Best regards,
+If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
 
-        Omar Bayat
-        White & Co. Real Estate
-        ---
-        Output ONLY the final message.
+Best regards,
+
+Omar Bayat
+White & Co. Real Estate
+
+Output the entire message only. Do not summarize, do not skip the introduction or closing.
 """)
 
         # Run button
