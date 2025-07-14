@@ -417,8 +417,20 @@ Output the entire message only. Do not summarize, do not skip the introduction o
             sent_pairs.add(dedup_key)
 
             if not property_type:
-                # ... [same property_type deduction as before] ...
-                pass
+                if 'apartment' in unit_column_name:
+                    property_type = 'apartment'
+                elif 'flat' in unit_column_name:
+                    property_type = 'flat'
+                elif 'office' in unit_column_name:
+                    property_type = 'office'
+                elif 'room' in unit_column_name:
+                    property_type = 'room'
+                elif 'villa' in unit_column_name:
+                    property_type = 'villa'
+                elif 'unit' in unit_column_name:
+                    property_type = 'unit'
+                else:
+                    property_type = 'property'  # fallback
 
             log(f"Inferred property type: '{property_type}' from column '{unit_column_name}'")
             number = TEST_NUMBER if USE_TEST_NUMBER else real_number
