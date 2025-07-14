@@ -6,8 +6,44 @@ import csv
 from collections import defaultdict
 import re
 from PIL import Image, ImageTk
+import os
+
+PROGRESS_FILE = "whatsapp_progress.csv"
+
+def get_last_row_processed(sheet, tab):
+    if not os.path.exists(PROGRESS_FILE):
+        return 0
+    with open(PROGRESS_FILE, "r", encoding="utf-8") as f:
+        import csv
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row['sheet'] == sheet and row['tab'] == tab:
+                return int(row['last_row'])
+    return 0
+
+def set_last_row_processed(sheet, tab, last_row):
+    import csv
+    records = []
+    found = False
+    if os.path.exists(PROGRESS_FILE):
+        with open(PROGRESS_FILE, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            records = list(reader)
+    for row in records:
+        if row['sheet'] == sheet and row['tab'] == tab:
+            row['last_row'] = str(last_row)
+            found = True
+    if not found:
+        records.append({'sheet': sheet, 'tab': tab, 'last_row': str(last_row)})
+    with open(PROGRESS_FILE, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=['sheet', 'tab', 'last_row'])
+        writer.writeheader()
+        for row in records:
+            writer.writerow(row)
 
 class WhatsAppBotGUI:
+
+
     def __init__(self, root):
         self.root = root
         self.root.title("WhatsApp Message Bot - Powered by Barrana")
@@ -187,15 +223,34 @@ Output the entire message only. Do not summarize, do not skip the introduction o
 
         custom_prompt = self.prompt_text.get("1.0", "end").strip()
 
+        # ---- RESUME/RESTART PROMPT ----
+        resume_rows = {}
+        for tab in selected_tabs:
+            last_row = get_last_row_processed(original_sheet_name, tab)
+            resume_rows[tab] = last_row
+
+        ask_resume = any(r > 0 for r in resume_rows.values())
+        user_selected_resume = False
+        if ask_resume:
+            msg = "Progress found for these tabs:\n"
+            for tab in selected_tabs:
+                if resume_rows[tab] > 0:
+                    msg += f"- {tab}: Last sent message row {resume_rows[tab]}\n"
+            msg += "\nResume from last progress? (Yes = resume, No = restart from row 1 for all)"
+            user_selected_resume = messagebox.askyesno("Resume Progress?", msg)
+
+        if not user_selected_resume:
+            resume_rows = {tab: 0 for tab in selected_tabs}
+
         self.log_to_gui(f"🚀 Running bot for Sheet: {selected_display_sheet}, Tabs: {', '.join(selected_tabs)}", "info")
         self.run_button.config(state=tk.DISABLED)
 
-        thread = threading.Thread(target=self.run_bot, args=(original_sheet_name, selected_tabs, custom_prompt))
+        thread = threading.Thread(target=self.run_bot, args=(original_sheet_name, selected_tabs, custom_prompt, resume_rows))
         thread.start()
 
-    def run_bot(self, sheet_name, selected_tabs, prompt):
+    def run_bot(self, sheet_name, selected_tabs, prompt, resume_rows):
         try:
-            run_whatsapp_bot(sheet_name, selected_tabs, prompt, log_fn=self.log_to_gui)
+            run_whatsapp_bot(sheet_name, selected_tabs, prompt, log_fn=self.log_to_gui, resume_rows=resume_rows)
         except Exception as e:
             self.log_to_gui(f"❌ Error running bot: {e}", "error")
         finally:
@@ -210,6 +265,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = WhatsAppBotGUI(root)
     root.mainloop()
+
 
 
 '''WhatsApp Message Bot GUI Launcher

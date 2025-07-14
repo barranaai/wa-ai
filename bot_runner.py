@@ -185,7 +185,7 @@ def scroll_to_load_all_rows(driver, pause_time=2, max_attempts=20):
     random_sleep(1, 2)
     log("✅ Scrolled back to top of table.", "info")
 
-def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] = None, prompt: str = None, log_fn=None):
+def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] = None, prompt: str = None, log_fn=None, resume_rows=None):
     def log(msg, tag=None):
         print(msg)
         if log_fn:
@@ -348,6 +348,15 @@ Output the entire message only. Do not summarize, do not skip the introduction o
 
         rows = driver.find_elements(By.XPATH, "//table[@id='myTable']/tbody/tr")
 
+        # -------- Resume Row Logic Start --------
+        start_row = 1
+        if resume_rows and tab_name in resume_rows:
+            try:
+                start_row = int(resume_rows[tab_name]) + 1
+            except Exception:
+                start_row = 1
+        # -------- Resume Row Logic End ----------
+
         headers = []
         for h in driver.find_elements(By.XPATH, "//table[@id='myTable']/thead/tr/th[position()>1]"):
             p = h.find_elements(By.TAG_NAME, "p")
@@ -390,6 +399,8 @@ Output the entire message only. Do not summarize, do not skip the introduction o
         idx_wn = match_col(['wn'], fuzzy_contains=True)
 
         for i, row in enumerate(rows, 1):
+            if i < start_row:
+                continue
             # --- Always check current handles at the very start ---
             handles = driver.window_handles
             if len(handles) < 2:
@@ -735,6 +746,14 @@ Output the entire message only. Do not summarize, do not skip the introduction o
                 message=message,
                 status="SENT"
             )
+            # Record progress after each processed row
+            try:
+                from gui_launcher import set_last_row_processed
+                set_last_row_processed(selected_sheet_name, tab_name, i)
+            except ImportError:
+            # If function is not available, just pass (or you can copy the helper into this file)
+                pass
+            
             random_sleep(1, 3)
             # === Safe tab closing and tab switching ===
             try:
