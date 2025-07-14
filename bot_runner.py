@@ -94,27 +94,25 @@ def generate_ai_message(full_name, last_name, building_name, unit_number, proper
                 f"your {unit_term} {unit_number}" if unit_number else f"your {unit_term}"
     if prompt is None:
         prompt = """
-        The person's full name is: "{full_name}"
-        - If this is a person's name, detect gender and use: {greeting} [Salutation] [Last Name].
-        - If this is a company name (e.g., contains LLC, LIMITED, COMPANY, BANK etc.), do NOT use Mr./Ms.
-          Instead, use: {greeting},
-
         ---
-        My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai.
-        I am reaching out regarding {unit_info}. May I ask if it is currently vacant and available for rent?
-        I have a qualified client actively searching in the building who would be interested in arranging a viewing at your earliest convenience if the property is available. Kindly confirm its availability and any further details.
-        Looking forward to your response. Thank you, and have a lovely day ahead.
+    Greetings. My name is Omar Bayat, and I am Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
 
-        Best regards,  
-        Omar Bayat  
-        White & Co. Real Estate
+    I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
 
-        Slightly vary the wording professionally for each message. Output ONLY the final message.
+    Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
+
+    If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
+
+    Looking forward to hearing from you.
+
+    Best regards,
+
+    Omar Bayat
+    White & Co. Real Estate
+
+    Output ONLY the final message. Output ONLY the final message.
         """
     formatted_prompt = prompt.format(
-        greeting=greeting,
-        full_name=full_name,
-        last_name=last_name,
         unit_info=unit_info
     )
 
@@ -193,6 +191,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
         log("🔴 No prompt received. Using fallback.", "error")
 
     fallback_prompt = """
+    ---
     Greetings. My name is Omar Bayat, and I am Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
 
     I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
@@ -207,7 +206,7 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
 
     Omar Bayat
     White & Co. Real Estate
-    ---
+
     Output ONLY the final message.
     """
 
