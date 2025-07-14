@@ -17,7 +17,7 @@ import csv
 
 # === CONFIGURATION ===
 pyautogui.FAILSAFE = False
-USE_TEST_NUMBER = True
+USE_TEST_NUMBER = False
 TEST_NUMBER = "923226100103"  # Replace with your real test number
 
 # === LOAD ENV & OPENAI ===
@@ -522,7 +522,7 @@ Output the entire message only. Do not summarize, do not skip the introduction o
                             )
                             continue_chat_btn.click()
                             log("✅ Clicked 'Continue to Chat' button quickly.")
-                            random_sleep(0.5, 1)
+                            random_sleep(0.5, 2)
                         except:
                             pass
                         try:
@@ -531,7 +531,7 @@ Output the entire message only. Do not summarize, do not skip the introduction o
                             )
                             use_whatsapp_web_btn.click()
                             log("✅ Clicked 'Use WhatsApp Web' button quickly.")
-                            random_sleep(0.5, 1)
+                            random_sleep(0.5, 2)
                         except:
                             pass
                         try:
@@ -540,7 +540,7 @@ Output the entire message only. Do not summarize, do not skip the introduction o
                             )
                             continue_popup_btn.click()
                             log("✅ Clicked 'Continue' popup button quickly.")
-                            random_sleep(0.5, 1)
+                            random_sleep(0.5, 2)
                         except:
                             pass
 
