@@ -17,7 +17,7 @@ import csv
 
 # === CONFIGURATION ===
 pyautogui.FAILSAFE = False
-USE_TEST_NUMBER = False
+USE_TEST_NUMBER = True
 TEST_NUMBER = "923226100103"  # Replace with your real test number
 
 # === LOAD ENV & OPENAI ===
@@ -753,7 +753,7 @@ Output the entire message only. Do not summarize, do not skip the introduction o
             except ImportError:
             # If function is not available, just pass (or you can copy the helper into this file)
                 pass
-            
+
             random_sleep(1, 3)
             # === Safe tab closing and tab switching ===
             try:
