@@ -193,19 +193,19 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
         log("🔴 No prompt received. Using fallback.", "error")
 
     fallback_prompt = """
-    The person's full name is: "{full_name}"
-    - If this is a person's name, detect gender and use: {greeting} [Salutation] [Last Name].
-    - If this is a company name (e.g., contains LLC, LIMITED, COMPANY, BANK etc.), do NOT use Mr./Ms.
-      Instead, use: {greeting},
+    Greetings. My name is Omar Bayat, and I am Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
 
-    ---
-    My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai.
-    I am reaching out regarding {unit_info}. May I ask if it is currently vacant and available for rent?
-    I have a qualified client actively searching in the building who would be interested in arranging a viewing at your earliest convenience if the property is available. Kindly confirm its availability and any further details.
-    Looking forward to your response. Thank you, and have a lovely day ahead.
+    I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
 
-    Best regards,  
-    Omar Bayat  
+    Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
+
+    If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
+
+    Looking forward to hearing from you.
+
+    Best regards,
+
+    Omar Bayat
     White & Co. Real Estate
 
     Slightly vary the wording professionally for each message. Output ONLY the final message.
@@ -328,6 +328,8 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
     #matched_tabs = [frontend_tab_map[norm] for norm in normalized_selected_tabs if norm in frontend_tab_map]
 
     message_count = 0
+    # Set to track (unit_number, owner_name) to avoid duplicates
+    sent_pairs = set()
     for tab_index, tab in enumerate(matched_tabs):
         tab_name = tab.text.strip().replace(" ", "_")
         log(f"\n=== Processing Tab {tab_index + 1}: {tab_name} ===", "info")
@@ -397,6 +399,21 @@ def run_whatsapp_bot(selected_sheet_name: str = None, selected_tabs: list[str] =
             real_number = values[idx_wn] if idx_wn is not None else ""
             unit_column_name = headers[idx_unit].lower() if idx_unit is not None else ""
             property_type = values[idx_property_type] if (idx_property_type is not None and values[idx_property_type].strip()) else ""
+
+            # Deduplication logic:
+            dedup_key = (unit_number.strip().lower(), full_name.strip().lower())
+            if dedup_key in sent_pairs:
+                log(f"⚠️ Skipping Row {i}: Already messaged '{full_name}' for unit '{unit_number}'.", "warn")
+                log_sent_message(
+                    sheet=selected_sheet_name,
+                    tab=tab_name,
+                    name=full_name,
+                    number=real_number,
+                    message="SKIPPED - Duplicate",
+                    status="SKIPPED"
+                )
+                continue  # Skip duplicate
+            sent_pairs.add(dedup_key)
 
             if not property_type:
                 # ... [same property_type deduction as before] ...

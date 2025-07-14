@@ -56,19 +56,21 @@ class WhatsAppBotGUI:
 
         self.prompt_text = tk.Text(root, height=15, width=90)
         self.prompt_text.pack(padx=10, pady=5)
-        self.prompt_text.insert("1.0", """The person's full name is: "{full_name}"
-        - If this is a person's name, detect gender and use: {greeting} [Salutation] [Last Name].
-        - If this is a company name (e.g., contains LLC, LIMITED, COMPANY, BANK etc.), do NOT use Mr./Ms.
-          Instead, use: {greeting},
-
+        self.prompt_text.insert("1.0", """
         ---
-        My name is Omar Bayat, and I am a Property Consultant at White & Co. Real Estate, one of the leading British-owned brokerages in Dubai.
-        I am reaching out regarding {unit_info}. May I ask if it is currently vacant and available for rent?
-        I have a qualified client actively searching in the building who would be interested in arranging a viewing at your earliest convenience if the property is available. Kindly confirm its availability and any further details.
-        Looking forward to your response. Thank you, and have a lovely day ahead.
+        Greetings. My name is Omar Bayat, and I am Property Consultant at White & Co., one of the leading British-owned brokerages in Dubai.
 
-        Best regards,  
-        Omar Bayat  
+        I am reaching out regarding {unit_info}. I currently have a qualified client searching specifically in the building, and wanted to ask if your apartment is available for rent.
+
+        Just last week, I closed over AED 420,000 in rental deals, and as a Super Agent on Property Finder and TruBroker on Bayut, I can give your unit maximum exposure and help secure a reliable tenant quickly.
+
+        If it is already occupied, please feel free to save my details for future opportunities. I would be happy to assist when the time is right.
+
+        Looking forward to hearing from you.
+
+        Best regards,
+
+        Omar Bayat
         White & Co. Real Estate
 
         Slightly vary the wording professionally for each message. Output ONLY the final message.
