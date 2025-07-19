@@ -418,6 +418,22 @@ Output the entire message only. Do not summarize, do not skip the introduction o
             unit_column_name = headers[idx_unit].lower() if idx_unit is not None else ""
             property_type = values[idx_property_type] if (idx_property_type is not None and values[idx_property_type].strip()) else ""
 
+            # New deduplication: ONLY by owner name
+            owner_key = full_name.strip().lower()
+            if owner_key in sent_pairs:
+                log(f"⚠️ Skipping Row {i}: Already messaged '{full_name}' in this tab.", "warn")
+                log_sent_message(
+                    sheet=selected_sheet_name,
+                    tab=tab_name,
+                    name=full_name,
+                    number=real_number,
+                    message="SKIPPED - Duplicate Owner",
+                    status="SKIPPED"
+                )
+                continue  # Skip duplicate owner
+            sent_pairs.add(owner_key)
+            
+            ''' 
             # Deduplication logic:
             dedup_key = (unit_number.strip().lower(), full_name.strip().lower())
             if dedup_key in sent_pairs:
@@ -432,6 +448,7 @@ Output the entire message only. Do not summarize, do not skip the introduction o
                 )
                 continue  # Skip duplicate
             sent_pairs.add(dedup_key)
+            ''' 
 
             if not property_type:
                 if 'apartment' in unit_column_name:
